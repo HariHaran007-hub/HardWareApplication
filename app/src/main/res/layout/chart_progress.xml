@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardElevation="0dp"
+    android:layout_gravity="center_horizontal"
+    app:cardMaxElevation="0dp"
+    app:strokeColor="@color/green"
+    app:strokeWidth="1dp"
+    app:cardBackgroundColor="@color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.tobiasschuerg.progresscircle.ProgressCircleView
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:thickness="@dimen/_8sdp"
+            android:layout_gravity="center_horizontal"
+            app:radius="@dimen/_100sdp"
+            app:textSize="18sp"
+            app:clockwise="true"
+            android:layout_margin="@dimen/_10sdp"
+            app:colorActive="@color/green"
+            app:colorInactive="#eee"
+            android:layout_marginTop="8dp"/>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/progressTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Humidity"
+
+            android:textSize="@dimen/_16ssp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/_4sdp"/>
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</com.google.android.material.card.MaterialCardView>

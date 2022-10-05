@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "687612588622",
+    "firebase_url": "https://hardwareproject-406b5-default-rtdb.firebaseio.com",
+    "project_id": "hardwareproject-406b5",
+    "storage_bucket": "hardwareproject-406b5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:687612588622:android:f41ae2d014ece8cb25491f",
+        "android_client_info": {
+          "package_name": "com.rcappstudio.indoorfarming"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "687612588622-lnhd87egu77ssupte0grgnrk7roae31q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcfg9awKIFcGqdwqoR0UDu4Yo6QzTOi9s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "687612588622-lnhd87egu77ssupte0grgnrk7roae31q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:687612588622:android:313e2642e439f22e25491f",
+        "android_client_info": {
+          "package_name": "com.rcappstudio.notificationfirebaseinapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "687612588622-lnhd87egu77ssupte0grgnrk7roae31q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcfg9awKIFcGqdwqoR0UDu4Yo6QzTOi9s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "687612588622-lnhd87egu77ssupte0grgnrk7roae31q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
