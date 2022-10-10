@@ -2,15 +2,17 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="@dimen/_5sdp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/rvCardView"
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_8sdp"
         app:cardBackgroundColor="#66EE1313"
-        app:cardElevation="@dimen/_200sdp"
+        app:cardElevation="@dimen/_100sdp"
+        app:cardMaxElevation="@dimen/_100sdp"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -52,7 +54,7 @@
                     android:layout_height="1dp"
                     android:layout_marginStart="@dimen/_4sdp"
                     android:layout_marginEnd="@dimen/_4sdp"
-                    android:background="#656363" />
+                    android:background="#666464" />
 
                 <TextView
                     android:id="@+id/rvPlantStatTextView"
@@ -71,8 +73,23 @@
                     android:layout_marginTop="@dimen/_2sdp"
                     android:text="Last watered: 1/10/2022"
                     android:textColor="@color/black" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/rvBtnClickToWater"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:layout_marginBottom="@dimen/_2sdp"
+                    android:drawableStart="@drawable/ic_baseline_water_drop_24"
+                    android:drawablePadding="@dimen/_2sdp"
+                    android:text="Click to water"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_14ssp"
+                    android:textStyle="bold" />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
     </com.google.android.material.card.MaterialCardView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

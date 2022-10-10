@@ -2,9 +2,11 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/_200sdp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="@dimen/_15sdp"
+    app:cardCornerRadius="@dimen/_10sdp"
     android:background="@color/white"
     android:layout_margin="@dimen/_10sdp"
+
+    app:cardBackgroundColor="@color/white"
     android:layout_height="wrap_content">
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="wrap_content"
@@ -25,7 +27,7 @@
             android:layout_margin="@dimen/_4sdp"
             android:textColor="@color/black"
             android:ellipsize="end"
-            android:maxLines="3"
+            android:maxLines="4"
             android:fontFamily="@font/mplus_rounded_1c_medium"
             android:text="Elon musk suggest new space craft launches in the sky "/>
 

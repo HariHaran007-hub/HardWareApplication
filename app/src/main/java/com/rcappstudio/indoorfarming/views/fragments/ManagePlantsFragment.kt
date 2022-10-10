@@ -2,10 +2,13 @@ package com.rcappstudio.indoorfarming.views.fragments
 
 import android.app.ActivityManager
 import android.app.AlertDialog
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,7 +18,11 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -23,6 +30,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.rcappstudio.indoorfarming.R
 import com.rcappstudio.indoorfarming.adapters.PlantsListAdapter
+import com.rcappstudio.indoorfarming.connectivity.ConnectivityObserver
+import com.rcappstudio.indoorfarming.connectivity.NetworkConnectivityObserver
 import com.rcappstudio.indoorfarming.databinding.FragmentManagePlantsBinding
 import com.rcappstudio.indoorfarming.models.dbModel.PlantModel
 import com.rcappstudio.indoorfarming.utils.Constants
@@ -30,6 +39,9 @@ import com.rcappstudio.indoorfarming.utils.LoadingDialog
 import com.rcappstudio.indoorfarming.utils.MyService
 import com.rcappstudio.indoorfarming.utils.isConnected
 import com.rcappstudio.indoorfarming.views.activities.AddPlantActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class ManagePlantsFragment : Fragment() {
@@ -39,13 +51,13 @@ class ManagePlantsFragment : Fragment() {
     private lateinit var loadingDialog : LoadingDialog
     private lateinit var isdialog : AlertDialog
     private lateinit var inflater : LayoutInflater
+    private lateinit var connectivityObserver: ConnectivityObserver
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         this.inflater = inflater
         binding = FragmentManagePlantsBinding.inflate(LayoutInflater.from(requireContext()))
         return binding.root
@@ -53,77 +65,28 @@ class ManagePlantsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.appBar.toolbar.title = "Manage plants"
         loadingDialog = LoadingDialog(requireActivity(), "Loading please wait.....")
         createNetworkDialog()
-        init()
-        checkService()
+
+        connectivityObserver = NetworkConnectivityObserver(requireContext())
+        CoroutineScope(Dispatchers.Main).launch {
+            observeNetworkChanges()
+        }
         clickListeners()
     }
 
-    private fun checkService(){
-        val serviceValue = requireContext().getSharedPreferences(Constants.SHARED_PREF, MODE_PRIVATE).getBoolean(Constants.SERVICE_PROVIDER, false)
-        if(serviceValue){
-            requireActivity().startService(Intent(requireActivity(), MyService::class.java))
-        }
-        binding.serviceProvider.isChecked = serviceValue
-    }
 
     private fun clickListeners(){
 
         binding.fabAddNewPlant.setOnClickListener {
             startActivity(Intent(requireContext(), AddPlantActivity::class.java ))
-        }
-
-        binding.serviceProvider.setOnClickListener {
-            if(binding.serviceProvider.isChecked){
-                requireContext().getSharedPreferences(Constants.SHARED_PREF, MODE_PRIVATE).edit()
-                    .apply {
-                        putBoolean(Constants.SERVICE_PROVIDER, true)
-                        requireActivity().startService(Intent(requireActivity(), MyService::class.java))
-                    }.apply()
-
-            } else {
-                requireContext().getSharedPreferences(Constants.SHARED_PREF, MODE_PRIVATE).edit()
-                    .apply {
-                        putBoolean(Constants.SERVICE_PROVIDER, false)
-                        requireActivity().stopService(Intent(requireActivity(), MyService::class.java))
-                    }.apply()
-
-            }
+            requireActivity().onBackPressed()
         }
     }
 
-    private fun startStopService(){
-        if(isMyServiceRunning(MyService::class.java)){
-            Toast.makeText(requireContext(), "Service is Stopped", Toast.LENGTH_LONG).show()
-
-            requireActivity().stopService(Intent(requireActivity(), MyService::class.java))
-        } else {
-            Toast.makeText(requireContext(), "Service is started......", Toast.LENGTH_LONG).show()
-
-            requireActivity().startService(Intent(requireActivity(), MyService::class.java))
-
-        }
-    }
-
-
-    private fun isMyServiceRunning(mClass: Class<MyService>) : Boolean{
-        val manager : ActivityManager = requireActivity().getSystemService(
-            Context.ACTIVITY_SERVICE
-        ) as ActivityManager
-
-        for (service: ActivityManager.RunningServiceInfo in manager.getRunningServices(Integer.MAX_VALUE)){
-
-            if(mClass.name.equals(service.service.className)){
-                return true
-            }
-        }
-        return false
-    }
 
     private fun fetchData(){
-
-        //TODO: Yet to add complete path after authentication
         loadingDialog.startLoading()
         FirebaseDatabase.getInstance().getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}")
             .get().addOnSuccessListener { snapshot->
@@ -131,7 +94,6 @@ class ManagePlantsFragment : Fragment() {
                     val plantsList = mutableListOf<PlantModel>()
                     for(p in snapshot.children){
                         val plant = p.getValue(PlantModel::class.java)
-                        Log.d("TAGData", "fetchData: $plant")
                         plantsList.add(plant!!)
                     }
                     initRecyclerView(plantsList)
@@ -144,6 +106,8 @@ class ManagePlantsFragment : Fragment() {
     }
 
     private fun initRecyclerView(plantsList : MutableList<PlantModel>){
+
+
         binding.rvPlantsList.layoutManager = LinearLayoutManager(requireContext())
         binding.rvPlantsList.setHasFixedSize(true)
         plantsListAdapter = PlantsListAdapter(requireContext(),plantsList){item, pos->
@@ -154,6 +118,28 @@ class ManagePlantsFragment : Fragment() {
             }.apply()
         }
         binding.rvPlantsList.adapter = plantsListAdapter
+
+        val swipeToDeleteCallback = object : SwipeToDeleteCallback(){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                if(plantsList.size == 1){
+                    fetchData()
+                    Snackbar.make(binding.root , "Cannot delete the plant minimum should be one", Snackbar.LENGTH_LONG).show()
+                } else{
+
+                    showAlertDialog(plantsList.get(position))
+                }
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+
+        itemTouchHelper.attachToRecyclerView(binding.rvPlantsList)
+    }
+
+    private fun removePlant(plant : PlantModel){
+        FirebaseDatabase.getInstance().getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}/${plant.key}")
+            .removeValue()
     }
 
 
@@ -196,7 +182,32 @@ class ManagePlantsFragment : Fragment() {
             isdialog.dismiss()
         } else{
             isdialog.show()
-            Log.d("networkState", "onViewCreated: no internet")
+        }
+    }
+
+    private fun showAlertDialog(plant: PlantModel){
+
+        AlertDialog.Builder(requireContext()).setMessage("Please confirm to delete this plant")
+            .setPositiveButton("Confirm")
+            { _,_ ->
+                removePlant(plant)
+
+            }.setNegativeButton("Cancel")
+            { dialog, _ ->
+                fetchData()
+                dialog.dismiss()
+            }.show()
+
+    }
+
+    private suspend fun observeNetworkChanges(){
+        connectivityObserver.observe().collect{
+            if(it == ConnectivityObserver.Status.Available){
+                isdialog.dismiss()
+                fetchData()
+            } else {
+                isdialog.show()
+            }
         }
     }
 }

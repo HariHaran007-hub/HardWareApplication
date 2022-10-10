@@ -19,7 +19,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -78,6 +79,7 @@ dependencies {
     //Circular progress
     implementation 'com.github.tobiasschuerg:CircleProgress:1.3.0'
 
+
     //Lottie animations
     implementation 'com.airbnb.android:lottie:5.2.0'
 
@@ -92,5 +94,10 @@ dependencies {
 
     //Image Crop library
     implementation 'com.github.CanHub:Android-Image-Cropper:4.3.1'
+
+    //Qr code library
+    implementation 'com.github.yuriy-budiyev:code-scanner:2.3.2'
+
+
 
 }

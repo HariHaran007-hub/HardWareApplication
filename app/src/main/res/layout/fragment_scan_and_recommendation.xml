@@ -19,16 +19,6 @@
             android:layout_height="wrap_content"
             />
 
-        <TextView
-            android:id="@+id/tvPlantHealthLog"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/appBar"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:fontFamily="@font/mplus_rounded_1c_regular"
-            android:text="Plant health log"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_14ssp" />
 
 
 
@@ -36,11 +26,8 @@
             android:id="@+id/rvPlantHealthLog"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/tvPlantHealthLog"
-            android:layout_marginStart="@dimen/_5sdp"
-            android:layout_marginTop="@dimen/_5sdp"
-            android:layout_marginEnd="@dimen/_5sdp"
-            android:layout_marginBottom="@dimen/_5sdp" />
+            android:layout_below="@id/appBar"
+           />
 
 
     </RelativeLayout>

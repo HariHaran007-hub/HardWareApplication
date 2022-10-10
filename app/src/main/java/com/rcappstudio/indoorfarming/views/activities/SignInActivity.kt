@@ -20,6 +20,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 import com.rcappstudio.indoorfarming.R
 import com.rcappstudio.indoorfarming.databinding.ActivitySignInBinding
+import com.rcappstudio.indoorfarming.models.dbModel.PlantModel
 import com.rcappstudio.indoorfarming.utils.Constants
 
 class SignInActivity : AppCompatActivity() {
@@ -107,10 +108,21 @@ class SignInActivity : AppCompatActivity() {
 
     private fun checkPlantAvailable(){
         FirebaseDatabase.getInstance().getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}")
-            .get().addOnSuccessListener {
-                if(it.exists()){
-                    startActivity(Intent(this , MainActivity::class.java))
-                    finish()
+            .get().addOnSuccessListener {snapshot->
+                if(snapshot.exists()){
+                    var key = ""
+                    for(c in snapshot.children){
+                        val plant = c.getValue(PlantModel::class.java)!!
+                        key = plant.key.toString()
+                        break
+                    }
+                    getSharedPreferences(Constants.SHARED_PREF, MODE_PRIVATE).edit().apply {
+                        putString(Constants.PLANT_KEY, key)
+                        startActivity(Intent(applicationContext , MainActivity::class.java))
+                        finish()
+                    }.apply()
+
+
                 } else {
                     val intent = Intent(this, AddPlantActivity::class.java)
                     intent.putExtra("from",1)
@@ -120,12 +132,4 @@ class SignInActivity : AppCompatActivity() {
             }
     }
 
-    override fun onStart() {
-        if(FirebaseAuth.getInstance().currentUser != null){
-            startActivity(Intent(this , MainActivity::class.java))
-            finish()
-        } else{
-            super.onStart()
-        }
-    }
 }

@@ -19,7 +19,8 @@ interface Api {
     suspend fun getYoutubeResults(
         @Query("part") part : String,
         @Query("q") q: String,
-        @Query("key") key : String
+        @Query("key") key : String,
+        @Query("maxResults") maxResults: Int ?= 20
     ) : Response<YoutubeResults>
 
 }

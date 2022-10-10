@@ -7,12 +7,16 @@
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/activity_add_plant.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/activity_sign_in.xml" value="0.22083333333333333" />
+        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/activity_splash.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/bottom_sheet_fragment.xml" value="0.264" />
-        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/chart_progress.xml" value="0.2" />
+        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/chart_progress.xml" value="0.264" />
+        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/custom_notification_layout.xml" value="0.264" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/custom_toolbar.xml" value="0.22083333333333333" />
-        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/fragment_home.xml" value="0.176" />
+        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/fragment_home.xml" value="0.2" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/fragment_manage_plants.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/fragment_scan_and_recommendation.xml" value="0.22083333333333333" />
+        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/fragment_settings.xml" value="0.22083333333333333" />
+        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/home_plant_rv.xml" value="0.264" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/item_plant_health_log.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/item_plant_health_overview.xml" value="0.21979166666666666" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/item_youtube_thumbnail.xml" value="0.22083333333333333" />
@@ -21,6 +25,8 @@
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/no_internet.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/no_internet_dialog.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/plants_list.xml" value="0.22083333333333333" />
+        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/water_pump_dialog.xml" value="0.22083333333333333" />
+        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/water_puump_dialog.xml" value="0.21979166666666666" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/menu/bottom_nav_menu.xml" value="0.22083333333333333" />
       </map>
     </option>

@@ -14,6 +14,7 @@ import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import com.budiyev.android.codescanner.*
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageView
 import com.canhub.cropper.options
@@ -28,6 +29,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.rcappstudio.indoorfarming.R
+import com.rcappstudio.indoorfarming.databinding.ActivityAddPlantBinding
 import com.rcappstudio.indoorfarming.models.dbModel.HealthLogModel
 import com.rcappstudio.indoorfarming.models.dbModel.PlantModel
 import com.rcappstudio.indoorfarming.models.imageprocessingModel.Data
@@ -42,8 +44,12 @@ import java.io.IOException
 
 class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListener {
 
+    private val CAMERA_REQUEST_CODE = 101
+
     private lateinit var macAddress: String
     private lateinit var loadingDialog : LoadingDialog
+    private lateinit var codeScanner : CodeScanner
+    private lateinit var binding : ActivityAddPlantBinding
 
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
@@ -52,6 +58,7 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
             val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uriContent)
             loadingDialog.startLoading()
             imageProcessingApiCall(uriContent,bitmap)
+            codeScanner.stopPreview()
         } else {
             // an error occurred
             val exception = result.error
@@ -61,10 +68,13 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_plant)
+        supportActionBar!!.hide()
+        binding = ActivityAddPlantBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        checkSelfPermissions()
         loadingDialog = LoadingDialog(this, "Loading please wait....")
-
-        openDialog()
+        codeScanner()
+//        openDialog()
     }
 
     private fun imageProcessingApiCall(uri: Uri ,bitmap : Bitmap?){
@@ -124,6 +134,7 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
 //        maxEnvironmentHumidity = 50,
 //        minEnvironmentHumidity = 20
 
+
 /*        val plantModel = PlantModel(
             plantName = responseData!!.plant,
             plantImageUrl = imageUrl,
@@ -180,7 +191,8 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
                 minLuminousIntensity = 25,
 
                 maxEnvironmentHumidity = 50.4,
-                minEnvironmentHumidity = 20.3
+                minEnvironmentHumidity = 20.3,
+                airQualityLevel = 14.0
             )).addOnSuccessListener {
                 if(intent.getIntExtra("from", 0) == 1){
 
@@ -190,15 +202,16 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
 
                                 FirebaseDatabase.getInstance()
                                     .getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}/$macAddress/${Constants.HEALTH_LOG}")
-                                    .push().setValue(HealthLogModel(imageUrl, responseData.disease, responseData.remedy ))
+                                    .push().setValue(HealthLogModel(imageUrl, responseData.disease, responseData.remedy, macAddress))
                                     .addOnSuccessListener {
                                         getSharedPreferences(Constants.SHARED_PREF, MODE_PRIVATE).edit().apply {
                                             putString(Constants.PLANT_KEY, macAddress)
-
+                                            loadingDialog.isDismiss()
+                                            startActivity(Intent(applicationContext, MainActivity::class.java))
+                                            finish()
                                         }.apply()
-                                        loadingDialog.isDismiss()
-                                        startActivity(Intent(this, MainActivity::class.java))
-                                        finish()
+
+
                                     }
                             } else{
                                 Toast.makeText(this, "Some error occured please try again later..", Toast.LENGTH_LONG).show()
@@ -208,14 +221,14 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
                 } else{
                     FirebaseDatabase.getInstance()
                         .getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}/${macAddress}/${Constants.HEALTH_LOG}")
-                        .push().setValue(HealthLogModel(imageUrl, responseData.disease, responseData.remedy ))
+                        .push().setValue(HealthLogModel(imageUrl, responseData.disease, responseData.remedy , macAddress ))
                         .addOnCompleteListener {
                             if (it.isSuccessful) {
                                 getSharedPreferences(Constants.SHARED_PREF, MODE_PRIVATE).edit()
                                     .apply {
                                         putString(Constants.PLANT_KEY, macAddress)
                                         loadingDialog.isDismiss()
-                                        onBackPressed()
+                                        finish()
                                     }.apply()
                             } else {
                                 Toast.makeText(this, "Some error occured please try again later..", Toast.LENGTH_LONG).show()
@@ -281,7 +294,50 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
         val b: ByteArray = baos.toByteArray()
         return Base64.encodeToString(b, Base64.DEFAULT)
     }
+
+    private fun codeScanner(){
+        codeScanner = CodeScanner(this, binding.qrScannerView)
+
+        codeScanner.apply {
+            camera = CodeScanner.CAMERA_BACK
+            formats = CodeScanner.ALL_FORMATS
+
+            autoFocusMode = AutoFocusMode.SAFE
+            scanMode = ScanMode.SINGLE
+            isAutoFocusEnabled = true
+            isFlashEnabled = false
+
+            decodeCallback = DecodeCallback {
+                runOnUiThread {
+                    applyTexts(it.text.toString().trim())
+                }
+            }
+
+            errorCallback = ErrorCallback{
+                runOnUiThread {
+                    Log.e("ErrorMain", "codeScanner: ${it.message}")
+                }
+            }
+        }
+
+        binding.qrScannerView.setOnClickListener {
+            codeScanner.startPreview()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        codeScanner.startPreview()
+    }
+
+    override fun onPause() {
+        codeScanner.releaseResources()
+        super.onPause()
+
+    }
+
     private fun openDialog() {
+        //TODO: Replace this dialog with QR code scanner
         val exampleDialog = ExampleDialog()
         exampleDialog.show(supportFragmentManager, "Enter mac address")
     }
@@ -291,6 +347,29 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
             this.macAddress = macAddress
             permissionChecker()
         }
+    }
+
+    private fun checkSelfPermissions(){
+        Dexter.withContext(this)
+            .withPermission(Manifest.permission.CAMERA)
+            .withListener(object : PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse) {
+
+                }
+
+                override fun onPermissionDenied(response: PermissionDeniedResponse) {
+                    Toast.makeText(
+                        this@AddPlantActivity, "You have denied!! camera permissions",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                override fun onPermissionRationaleShouldBeShown(
+                    permission: PermissionRequest?,
+                    token: PermissionToken?
+                ) {
+                    showRationalDialogForPermissions()
+                }
+            }).onSameThread().check()
     }
 
 

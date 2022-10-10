@@ -24,6 +24,7 @@ class LoadingDialog(val mActivity : Activity , val message : String?) {
     }
 
     fun isDismiss(){
-        isdialog.dismiss()
+        if(isdialog.isShowing)
+            isdialog.dismiss()
     }
 }

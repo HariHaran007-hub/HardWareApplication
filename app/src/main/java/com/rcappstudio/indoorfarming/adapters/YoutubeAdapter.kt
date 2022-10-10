@@ -34,7 +34,7 @@ class YoutubeAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = videoList[position]
         Picasso.get()
-            .load(item.snippet!!.thumbnails!!.medium!!.url)
+            .load(item.snippet!!.thumbnails!!.high!!.url)
             .fit()
             .centerCrop()
             .into(binding.rvYoutubeImageview)

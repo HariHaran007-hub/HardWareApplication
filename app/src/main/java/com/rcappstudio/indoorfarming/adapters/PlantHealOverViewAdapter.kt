@@ -14,8 +14,9 @@ import com.rcappstudio.indoorfarming.models.dbModel.PlantModel
 
 class PlantHealOverViewAdapter(
     private val context : Context,
-    private var plantList : HashMap<Int, MutableList<HealthLogModel>>,
-    val onClick : (HealthLogModel, Int) ->Unit
+    private var healthLogList : HashMap<Int, MutableList<HealthLogModel>>,
+    private var plantNameList  :MutableList<String>,
+    val onClick : (HealthLogModel, Int) ->Unit,
 ) : RecyclerView.Adapter<PlantHealOverViewAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
@@ -31,9 +32,12 @@ class PlantHealOverViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val plant = plantList.get(position)
-//        binding.tvPlantNameHealthLog.text = plant.plantName!!
-        setHealthLogAdapter(plant!!)
+        val healthLogList = healthLogList.get(position)
+        binding.tvPlantNameHealthLog.text = plantNameList[position]
+        binding.addHealthLog.setOnClickListener {
+            onClick.invoke(healthLogList!![0], 1)
+        }
+        setHealthLogAdapter(healthLogList!!)
     }
 
     private fun setHealthLogAdapter(healthLogList: MutableList<HealthLogModel>){
@@ -41,12 +45,12 @@ class PlantHealOverViewAdapter(
         binding.rvPlantHealthLog.setHasFixedSize(true)
         binding.rvPlantHealthLog.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         binding.rvPlantHealthLog.adapter = PlantsHealthLogAdapter(context,healthLogList){item, pos->
-           onClick.invoke(item, pos)
+           onClick.invoke(item, 0)//For youtube health log in bottom sheet
         }
     }
 
     override fun getItemCount(): Int {
-        return plantList.size
+        return healthLogList.size
     }
 
 

@@ -4,44 +4,39 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.rcappstudio.indoorfarming.R
-import com.rcappstudio.indoorfarming.databinding.PlantsListBinding
+import com.rcappstudio.indoorfarming.databinding.HomePlantRvBinding
 import com.rcappstudio.indoorfarming.models.dbModel.PlantModel
 import com.rcappstudio.indoorfarming.utils.getDateTime
 import com.squareup.picasso.Picasso
-import de.hdodenhof.circleimageview.CircleImageView
 
-class PlantsListAdapter(
+class HomePlantAdapter(
     private val context: Context,
-    private var plantsList: MutableList<PlantModel>,
+    private var plantList: MutableList<PlantModel>,
     val onClick: (PlantModel, Int) -> Unit
-) : RecyclerView.Adapter<PlantsListAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<HomePlantAdapter.ViewHolder>() {
 
-    private lateinit var binding: PlantsListBinding
+    private lateinit var binding: HomePlantRvBinding
 
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView = itemView.findViewById<CircleImageView>(R.id.rvPlantImageView)!!
-        val plantName = itemView.findViewById<TextView>(R.id.rvPlantName)!!
-        val plantStateTextView = itemView.findViewById<TextView>(R.id.rvPlantStatTextView)!!
-        val lastWatered = itemView.findViewById<TextView>(R.id.rvLastWatered)!!
-    }
-
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ViewHolder {
-        binding = PlantsListBinding.inflate(LayoutInflater.from(context), parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomePlantAdapter.ViewHolder {
+        binding = HomePlantRvBinding.inflate(LayoutInflater.from(context), parent, false)
         return ViewHolder(binding.root)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val plant = plantsList[position]
+        val plant = plantList[position]
 
-        //TODO: Yet to add complete check
+        binding.rvPlantName.text = plant.plantName
+
+        Picasso.get()
+            .load(plant.plantImageUrl)
+            .fit().centerCrop()
+            .into(binding.rvPlantImageView)
+
         if (
             (plant.minEnvironmentHumidity!! < plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!) &&
             (plant.minSoilPh!! < plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!) &&
@@ -51,7 +46,7 @@ class PlantsListAdapter(
 
         ) {
             binding.rvPlantStatTextView.text = "Plant is healthy \uD83D\uDE0A"
-            binding.rvCardView.setBackgroundColor(ContextCompat.getColor(context, R.color.greenLight2))
+            binding.cardView.setBackgroundColor(ContextCompat.getColor(context, R.color.greenLight2))
         } else if (
             (plant.minSoilPh!! < plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!) &&
             (plant.minLuminousIntensity!! < plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!) &&
@@ -169,29 +164,18 @@ class PlantsListAdapter(
             binding.rvPlantStatTextView.text =
                 "Humidity: ${plant.environmentHumidity}\nSoil PH: ${plant.soilPh}\nLight Intensity: ${plant.luminousIntensity}\nTemperature: ${plant.environmentTemperature}"
         } else {
-            binding.rvCardView.setBackgroundColor(ContextCompat.getColor(context, R.color.greenLight2))
+            binding.cardView.setBackgroundColor(ContextCompat.getColor(context, R.color.greenLight2))
             binding.rvPlantStatTextView.text = "Plant is healthty  \uD83D\uDE0A"
         }
 
+        binding.rvLastWatered.text = getDateTime(plant.lastWateredTimeStamp!!)
 
-
-        Picasso.get()
-            .load(plant.plantImageUrl)
-            .fit()
-            .centerCrop()
-            .into(holder.imageView)
-
-        holder.plantName.text = plant.plantName
-        holder.lastWatered.text = "Last watered: " + getDateTime(plant.lastWateredTimeStamp!!)
-
-        //Recycler view Click - Listener
-        binding.root.setOnClickListener {
-            onClick.invoke(plant,position)
+        binding.rvBtnClickToWater.setOnClickListener {
+            onClick.invoke(plant, position)
         }
-
     }
 
     override fun getItemCount(): Int {
-        return plantsList.size
+        return plantList.size
     }
 }

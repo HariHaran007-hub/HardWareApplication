@@ -5,51 +5,22 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     tools:context=".views.fragments.ManagePlantsFragment">
+
     <include
-        layout="@layout/custom_toolbar"
         android:id="@+id/appBar"
-        android:layout_alignParentTop="true"
+        layout="@layout/custom_toolbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:layout_alignParentTop="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/appBar"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="@dimen/_8sdp"
-        android:layout_marginRight="@dimen/_50sdp"
-        android:fontFamily="@font/mplus_rounded_1c_black"
-        android:text="Enable notifications: "
-        android:textColor="@color/black"
-        android:textSize="@dimen/_12ssp" />
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/serviceProvider"
-        android:layout_width="@dimen/_50sdp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/appBar"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="@dimen/_5sdp" />
-
-    <TextView
-        android:id="@+id/listOfPlants"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/serviceProvider"
-        android:text="List of Plants: "
-        android:layout_margin="@dimen/_5sdp"
-        android:textSize="@dimen/_16ssp"
-        android:fontFamily="@font/mplus_rounded_1c_bold"
-        android:textColor="@color/black"/>
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPlantsList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/listOfPlants"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/appBar"
+        android:layout_marginTop="@dimen/_10sdp"
         tools:listitem="@layout/plants_list" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

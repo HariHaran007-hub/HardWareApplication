@@ -20,7 +20,9 @@ data class PlantModel(
     val maxLuminousIntensity : Int ?= 0,
     val minLuminousIntensity : Int ?= 0,
     val maxEnvironmentHumidity : Double ?= 0.0,
+    val airQualityLevel : Double ?= 0.0,
     val minEnvironmentHumidity : Double ?= 0.0,
+    val healthLog : HashMap<String , HealthLogModel>?= null
 
 
 )

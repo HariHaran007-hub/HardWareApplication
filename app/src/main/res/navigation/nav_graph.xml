@@ -20,4 +20,9 @@
         android:name="com.rcappstudio.indoorfarming.views.fragments.ScanAndRecommendationFragment"
         android:label="fragment_scan_and_recommendation"
         tools:layout="@layout/fragment_scan_and_recommendation" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.rcappstudio.indoorfarming.views.fragments.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>
