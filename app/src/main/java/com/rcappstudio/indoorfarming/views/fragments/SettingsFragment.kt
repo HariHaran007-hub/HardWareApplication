@@ -113,7 +113,7 @@ class SettingsFragment : Fragment() {
                             binding.automaticWaterPump.isChecked = false
                             Snackbar.make(
                                 binding.root,
-                                "Please enable offline notification service",
+                                "Please enable background notification service",
                                 Snackbar.LENGTH_LONG
                             ).show()
                         }
@@ -124,6 +124,21 @@ class SettingsFragment : Fragment() {
                     .apply {
                         putBoolean(Constants.AUTOMATIC_WATER_PUMP, false)
                     }.apply()
+
+                if (isMyServiceRunning(MyService::class.java)) {
+                    requireContext().stopService(
+                        Intent(
+                            requireActivity(),
+                            MyService::class.java
+                        )
+                    )
+                    requireContext().startService(
+                        Intent(
+                            requireActivity(),
+                            MyService::class.java
+                        )
+                    )
+                }
             }
         }
 

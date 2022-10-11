@@ -26,13 +26,10 @@ import com.rcappstudio.indoorfarming.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.sql.Timestamp
-import java.util.*
 
 class HomeFragment : Fragment() {
 
     private lateinit var changesEvenListener: ValueEventListener
-    private lateinit var plantsEventListener: ValueEventListener
     private lateinit var connectivityObserver: ConnectivityObserver
     private lateinit var binding: FragmentHomeBinding
     private lateinit var loadingDialog : LoadingDialog
@@ -40,6 +37,10 @@ class HomeFragment : Fragment() {
     private lateinit var waterPumpDialog : AlertDialog
     private lateinit var inflater : LayoutInflater
     private lateinit var wateringTextView : TextView
+
+    private var databaseReference = FirebaseDatabase.getInstance()
+        .getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}")
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,16 +50,9 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadingDialog = LoadingDialog(requireActivity(), "Loading please wait")
-//        Log.d("timeData", "onViewCreated time difference: ${getTimeDifference(1665395615)}")
-        find(1665310048000)
         connectivityObserver = NetworkConnectivityObserver(requireContext())
 
         createNetworkDialog()
@@ -70,16 +64,13 @@ class HomeFragment : Fragment() {
             isdialog.show()
             }
 
-
         createWaterPumpDialog()
-//        init()
     }
 
     private fun fetchData(){
         loadingDialog.startLoading()
 
-
-        FirebaseDatabase.getInstance().getReference("${Constants.USERS}/${FirebaseAuth.getInstance().currentUser!!.uid}/${Constants.PLANTS}")
+       databaseReference
             .addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if(snapshot.exists()){
@@ -91,12 +82,11 @@ class HomeFragment : Fragment() {
                                 listenBackForChanges(plant)
                             }
                         }
-
                         initProgressView(plantList)
                         setupRecyclerView(plantList)
                         loadingDialog.isDismiss()
                     } else{
-                        Toast.makeText(requireActivity(), "No data present!!", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireActivity(), "Please select plant in plant management bar.", Toast.LENGTH_LONG).show()
                         loadingDialog.isDismiss()
                     }
                 }
@@ -108,13 +98,7 @@ class HomeFragment : Fragment() {
             })
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
     private fun initProgressView(plantList: MutableList<PlantModel>){
-        //TODO: Yet to add last watered
-
         if(activity != null){
             val pref = requireActivity().getSharedPreferences(Constants.SHARED_PREF, MODE_PRIVATE)
             val plantKey =pref.getString("Plant_Key", null)
@@ -124,8 +108,6 @@ class HomeFragment : Fragment() {
                     plantModel = it
                 }
             }
-
-
 
             if(plantModel != null){
                 binding.dashLastWatered.text = "Last watered: ${getDateTime(plantModel!!.lastWateredTimeStamp!!)}"
@@ -150,9 +132,6 @@ class HomeFragment : Fragment() {
                 binding.dashPlantName.text = plantModel!!.plantName.toString() + "Plant Monitor"
             }
         }
-
-
-
     }
 
     private fun createNetworkDialog(){
@@ -202,15 +181,14 @@ class HomeFragment : Fragment() {
 
     private fun  startWaterPump(plant  :PlantModel){
 
-        FirebaseDatabase.getInstance()
-            .getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}/${plant.key}/${Constants.PUMP_WATER}")
+       databaseReference.child("${plant.key}/${Constants.PUMP_WATER}")
             .setValue(true)
             .addOnCompleteListener {
                 if(it.isSuccessful){
                     listenBackForChanges(plant)
                 }
             }.addOnFailureListener {
-                Toast.makeText(requireContext(), "Unexpected error occurd", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Unexpected error occrd", Toast.LENGTH_LONG).show()
             }
     }
 
@@ -218,8 +196,7 @@ class HomeFragment : Fragment() {
 
     private fun listenBackForChanges(plant: PlantModel){
 
-        changesEvenListener = FirebaseDatabase.getInstance()
-            .getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}/${plant.key}/${Constants.PUMP_WATER}")
+        changesEvenListener = databaseReference.child("${plant.key}/${Constants.PUMP_WATER}")
             .addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if(snapshot.exists()){

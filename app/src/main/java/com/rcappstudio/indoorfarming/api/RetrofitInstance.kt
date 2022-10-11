@@ -1,4 +1,4 @@
-package com.rcappstudio.placesapi
+package com.rcappstudio.indoorfarming.api
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitInstance {
 
     val youtubeUrl = "https://youtube.googleapis.com/youtube/v3/"
-    val aiUrl = "https://plant-disease-detector-pytorch.herokuapp.com"
+    val aiUrl = "https://polar-ridge-44292.herokuapp.com/"
 
     val api: Api by lazy {
         Retrofit.Builder()

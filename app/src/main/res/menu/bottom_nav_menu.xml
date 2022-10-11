@@ -23,7 +23,7 @@
 
     <item
         android:id="@+id/settings"
-        android:title="Scan and Recommendation"
+        android:title="Settings"
         app:cnb_iconColor="@color/black"
         android:icon="@drawable/ic_baseline_settings_24"/>
 

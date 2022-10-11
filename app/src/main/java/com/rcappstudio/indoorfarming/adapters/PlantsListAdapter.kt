@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.makeramen.roundedimageview.RoundedImageView
 import com.rcappstudio.indoorfarming.R
 import com.rcappstudio.indoorfarming.databinding.PlantsListBinding
 import com.rcappstudio.indoorfarming.models.dbModel.PlantModel
@@ -24,7 +25,7 @@ class PlantsListAdapter(
 
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView = itemView.findViewById<CircleImageView>(R.id.rvPlantImageView)!!
+        val imageView = itemView.findViewById<RoundedImageView>(R.id.rvPlantImageView)!!
         val plantName = itemView.findViewById<TextView>(R.id.rvPlantName)!!
         val plantStateTextView = itemView.findViewById<TextView>(R.id.rvPlantStatTextView)!!
         val lastWatered = itemView.findViewById<TextView>(R.id.rvLastWatered)!!

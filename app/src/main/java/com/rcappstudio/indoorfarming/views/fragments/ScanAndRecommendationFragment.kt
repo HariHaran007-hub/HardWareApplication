@@ -47,7 +47,7 @@ import com.rcappstudio.indoorfarming.models.imageprocessingModel.ImageProcessing
 import com.rcappstudio.indoorfarming.utils.Constants
 import com.rcappstudio.indoorfarming.utils.LoadingDialog
 import com.rcappstudio.indoorfarming.utils.isConnected
-import com.rcappstudio.placesapi.RetrofitInstance
+import com.rcappstudio.indoorfarming.api.RetrofitInstance
 import com.rcappstudio.placesapi.youtubeDataModel.YoutubeResults
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +58,6 @@ import java.io.IOException
 
 class ScanAndRecommendationFragment : Fragment() {
 
-    //TODO: Replace all with auth id
 
     private lateinit var binding : FragmentScanAndRecommendationBinding
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
@@ -68,17 +67,16 @@ class ScanAndRecommendationFragment : Fragment() {
     private  var macAddress : String ?= null
     private lateinit var connectivityObserver: ConnectivityObserver
 
-
+    private var databaseReference = FirebaseDatabase.getInstance()
+        .getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}")
 
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
-            // use the returned uri
             val uriContent: Uri = result.uriContent!!
             val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uriContent)
             imageProcessingApiCall(uriContent,bitmap)
             loadingDialog.startLoading()
         } else {
-            // an error occurred
             val exception = result.error
         }
     }
@@ -112,10 +110,9 @@ class ScanAndRecommendationFragment : Fragment() {
         val plantNameList = mutableListOf<String>()
         loadingDialog.startLoading()
         var count = 0
-        FirebaseDatabase.getInstance().getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}").get()
+        databaseReference.get()
             .addOnSuccessListener { snapshot->
                 if(snapshot.exists()){
-                    val plantList = mutableListOf<PlantModel>()
                     for(p in snapshot.children){
                         val plant = p.getValue(PlantModel::class.java)!!
                         val healthLogList = mutableListOf<HealthLogModel>()
@@ -154,10 +151,8 @@ class ScanAndRecommendationFragment : Fragment() {
                 if(this.macAddress != null){
                     permissionChecker()
                 }
-
             }
         }
-
     }
 
     private fun initBottomSheet(dataString : String){
@@ -182,7 +177,7 @@ class ScanAndRecommendationFragment : Fragment() {
         val dataImage = encodeImage(bitmap!!)!!
         lifecycleScope.launchWhenStarted{
             val response = try {
-                RetrofitInstance.aiApi.getTodos(Data(dataImage))
+                RetrofitInstance.aiApi.getHealthLog(Data(dataImage))
             } catch (e : IOException){
 
                 return@launchWhenStarted
@@ -193,8 +188,9 @@ class ScanAndRecommendationFragment : Fragment() {
             }
 
             if(response.isSuccessful && response.body() != null){
-                //TODO: Store to firebase and Move to Main activity
                 storeImageToCloud(bitmap , response.body(), uri)
+            } else{
+                //TODO: Show some error occured
             }
         }
     }
@@ -213,8 +209,7 @@ class ScanAndRecommendationFragment : Fragment() {
 
     private fun storeToDatabase(url : String , responseData: ImageProcessingResponseData?){
         //TODO: Yet to manipulate the response data
-        FirebaseDatabase.getInstance()
-            .getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}/${this.macAddress}/${Constants.HEALTH_LOG}")
+       databaseReference.child("${this.macAddress}/${Constants.HEALTH_LOG}")
             .push().setValue(
                 HealthLogModel(
                     url,
@@ -226,8 +221,6 @@ class ScanAndRecommendationFragment : Fragment() {
                 if(it.isSuccessful){
                     loadingDialog.isDismiss()
                     requireActivity().onBackPressed()
-//                    switchToFragment(R.id.homeFragment)
-                    //TODO: Show pop up and move to home fragment
                 }
             }
     }
@@ -350,7 +343,7 @@ class ScanAndRecommendationFragment : Fragment() {
             }
         }
     }
-    fun watchYoutubeVideo(id: String) {
+    private fun watchYoutubeVideo(id: String) {
         val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$id"))
         val webIntent = Intent(
             Intent.ACTION_VIEW,

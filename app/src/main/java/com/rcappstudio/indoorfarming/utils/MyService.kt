@@ -97,7 +97,7 @@ class MyService  : Service() {
                         evaluateData(plant!!)
                         if(isAutomaticWater){
                             Log.d("NotificationData", "onDataChange time difference: ${getTimeDifference(plant.lastWateredTimeStamp!!)}")
-                            if(find(plant.lastWateredTimeStamp!!) > 4)
+                            if(find(plant.lastWateredTimeStamp!!) >= 4)
                                 evaluateWaterPump(plant)
                         }
                     }
@@ -362,7 +362,6 @@ class MyService  : Service() {
 
             notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
 
-//            showNotification(plant, "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
 //                    "Soil PH: ${plant.soilPh}\n" +
 //                    "Light Intensity: ${plant.luminousIntensity}\n" +
 //                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")*/

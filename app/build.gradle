@@ -98,6 +98,9 @@ dependencies {
     //Qr code library
     implementation 'com.github.yuriy-budiyev:code-scanner:2.3.2'
 
+    //Corner round image view
+    implementation 'com.makeramen:roundedimageview:2.3.0'
+
 
 
 }

@@ -39,7 +39,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/homeRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_150sdp"
+                android:layout_height="wrap_content"
                 tools:itemCount="1"
                 tools:listitem="@layout/home_plant_rv" />
 
@@ -48,8 +48,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
-                android:fontFamily="@font/mplus_rounded_1c_regular"
-                android:text="Neem Plant Monitor"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:fontFamily="@font/mplus_rounded_1c_extra_bold"
+                android:text="Money Plant Monitor"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_16ssp"
                 android:textStyle="bold" />
@@ -58,9 +59,10 @@
                 android:id="@+id/dashLastWatered"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="@dimen/_8sdp"
-                android:layout_marginTop="@dimen/_5sdp"
+
                 android:fontFamily="@font/mplus_rounded_1c_regular"
+
+                android:padding="@dimen/_5sdp"
                 android:text="Last watered: 1/10/2022"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_16ssp" />
@@ -148,7 +150,8 @@
             <!--                android:text="Click to water"-->
             <!--                android:textAlignment="center"-->
             <!--                android:textColor="@color/black"-->
-            <!--                android:textSize="@dimen/_20ssp"-->
+            <!--                android:textSize="@dimen/_d'wmd;lwineofjhfn ehkjks;kjn tf n np;ijknfuwhar is nbur b nekjdkjd nwkjeiernn;lskf whi skis knd pofnmmslilhlijis wenhy thias wwamnw this shkjhunowhsts kewjrfbnisejjebuelsjleehia
+            20ssp"-->
             <!--                android:textStyle="bold" />-->
 
 
