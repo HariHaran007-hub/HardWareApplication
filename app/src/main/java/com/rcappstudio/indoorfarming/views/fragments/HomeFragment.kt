@@ -1,16 +1,23 @@
 package com.rcappstudio.indoorfarming.views.fragments
 
 import android.app.AlertDialog
+import android.content.ActivityNotFoundException
 import android.content.Context.MODE_PRIVATE
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -18,19 +25,25 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.rcappstudio.indoorfarming.R
 import com.rcappstudio.indoorfarming.adapters.HomePlantAdapter
+import com.rcappstudio.indoorfarming.adapters.YoutubeAdapter
+import com.rcappstudio.indoorfarming.api.RetrofitInstance
 import com.rcappstudio.indoorfarming.connectivity.ConnectivityObserver
 import com.rcappstudio.indoorfarming.connectivity.NetworkConnectivityObserver
 import com.rcappstudio.indoorfarming.databinding.FragmentHomeBinding
 import com.rcappstudio.indoorfarming.models.dbModel.PlantModel
 import com.rcappstudio.indoorfarming.utils.*
+import com.rcappstudio.placesapi.youtubeDataModel.YoutubeResults
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class HomeFragment : Fragment() {
 
     private lateinit var changesEvenListener: ValueEventListener
     private lateinit var connectivityObserver: ConnectivityObserver
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var binding: FragmentHomeBinding
     private lateinit var loadingDialog : LoadingDialog
     private lateinit var isdialog : AlertDialog
@@ -54,7 +67,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         loadingDialog = LoadingDialog(requireActivity(), "Loading please wait")
         connectivityObserver = NetworkConnectivityObserver(requireContext())
-
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet.root)
         createNetworkDialog()
         if(isConnected(requireContext())) {
             CoroutineScope(Dispatchers.Main).launch {
@@ -62,14 +75,15 @@ class HomeFragment : Fragment() {
             }
         }else {
             isdialog.show()
-            }
+        }
+
+
 
         createWaterPumpDialog()
     }
 
     private fun fetchData(){
         loadingDialog.startLoading()
-
        databaseReference
             .addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -110,7 +124,7 @@ class HomeFragment : Fragment() {
             }
 
             if(plantModel != null){
-                binding.dashLastWatered.text = "Last watered: ${getDateTime(plantModel!!.lastWateredTimeStamp!!)}"
+//                binding.dashLastWatered.text = "Last watered: ${getDateTime(plantModel!!.lastWateredTimeStamp!!)}"
                 binding.progressSoilPh.progress.setProgress(plantModel!!.soilPh!!.toInt())
                 binding.progressSoilPh.progressTitle.text = "Soil PH"
 
@@ -129,7 +143,66 @@ class HomeFragment : Fragment() {
                 binding.progressAirQuality.progress.setProgress(plantModel!!.airQualityLevel!!.toInt())
                 binding.progressAirQuality.progressTitle.text = "Air quality"
 
-                binding.dashPlantName.text = plantModel!!.plantName.toString() + "Plant Monitor"
+                binding.dashPlantName.text = plantModel!!.plantName.toString() + " Plant Monitor"
+
+                binding.tvTemperature.text = plantModel!!.environmentTemperature!!.toInt().toString()+ "°C"
+
+                val intialLightIntensity = plantModel!!.luminousIntensity!!.toFloat()
+                Log.d("NewData", "initProgressView: intialLightIntensity: $intialLightIntensity")
+                var min = 0
+                var max = 255
+                var val1 = (intialLightIntensity - min)
+                Log.d("NewData", "initProgressView: val1: $val1")
+                var val2 = (max - min)
+                Log.d("NewData", "initProgressView: val2: $val2")
+                var output = val1 / val2
+                Log.d("NewData", "initProgressView: output: $output.")
+
+                var finalOutput = output * 100
+
+                binding.tvIntensity.text = finalOutput.toInt().toString() + "%"
+                binding.airQualityLevel.text = Math.abs(plantModel!!.airQualityLevel!!).toInt().toString() + "ppm"
+
+                binding.tvHumidityLevel.text = "Humidity level \n${plantModel!!.environmentHumidity!!.toInt().toString()}%"
+                binding.tvMoistureLevel.text = "Moisture level \n${plantModel!!.waterMoistureLevel!!.toInt().toString()}%"
+                binding.tvSoilPhLevel.text = "Soil PH ${plantModel!!.soilPh}"
+
+                binding.tvHumidity.text = plantModel!!.environmentHumidity!!.toInt().toString() + "%"
+                binding.tvSoilPh.text = plantModel!!.soilPh!!.toInt().toString()
+
+
+                val soil = plantModel!!.waterMoistureLevel!!.toFloat()
+                var min1 = 2575
+                var max1 = 4095
+                    var val11 = (soil - min1)
+                Log.d("NewData", "initProgressView: val11: $val11")
+                var val22 = (max1 - min1)
+                Log.d("NewData", "initProgressView: val22: $val22")
+                var output1 = val11 / val22
+                Log.d("NewData", "initProgressView: output: $output1")
+
+                var finalOutput1 = output1 * 100
+                Log.d("NewData", "initProgressView: finalOutput1: $finalOutput1")
+                Log.d("NewData", "initProgressView: finalOutput1: ${100-finalOutput1}")
+
+                binding.tvWaterMoisture.text = (100 - finalOutput1).toFloat().toInt().toString()+ "%"
+
+                binding.tvLastWatered.text = "Last watered: ${getDateTime(plantModel!!.lastWateredTimeStamp!!)}"
+                binding.btnClickToWater.setOnClickListener {
+                    showAlertDialog(plantModel!!)
+                }
+
+                binding.youtubeRecommendation.setOnClickListener {
+                    val state = if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                        BottomSheetBehavior.STATE_COLLAPSED
+                    } else {
+                        //TODO : Setup api call and recycler view adapter
+                        initBottomSheet("Tips to grow ${plantModel!!.plantName}")
+                        BottomSheetBehavior.STATE_EXPANDED
+                    }
+                    bottomSheetBehavior.state = state
+                }
+
             }
         }
     }
@@ -151,7 +224,12 @@ class HomeFragment : Fragment() {
         binding.homeRecyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.homeRecyclerView.setHasFixedSize(true)
         binding.homeRecyclerView.adapter = HomePlantAdapter(requireContext(), plantList){item , position ->
-            showAlertDialog(item)
+            requireContext().getSharedPreferences(Constants.SHARED_PREF, MODE_PRIVATE).edit()
+                .apply {
+                    putString(Constants.PLANT_KEY, item.key)
+                    fetchData()
+                }.apply()
+
         }
     }
 
@@ -233,6 +311,46 @@ class HomeFragment : Fragment() {
             } else {
                 isdialog.show()
             }
+        }
+    }
+
+    private fun initBottomSheet(dataString : String){
+        Log.d("YouTubeData", "initBottomSheet: data accessed")
+        lifecycleScope.launchWhenStarted {
+            val response = try {
+                RetrofitInstance.api.getYoutubeResults("snippet", dataString, Constants.YOUTUBE_API_KEY)
+            } catch (e: IOException) {
+
+                return@launchWhenStarted
+
+            } catch (e: HttpException) {
+                return@launchWhenStarted
+            }
+
+            if (response.isSuccessful && response.body() != null) {
+                setUpBottomSheetRecyclerView(response.body()!!)
+            }
+        }
+    }
+
+    private fun watchYoutubeVideo(id: String) {
+        val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$id"))
+        val webIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("http://www.youtube.com/watch?v=$id")
+        )
+        try {
+            startActivity(appIntent)
+        } catch (ex: ActivityNotFoundException) {
+            startActivity(webIntent)
+        }
+    }
+
+    private fun setUpBottomSheetRecyclerView(youtubeResults: YoutubeResults){
+        binding.bottomSheet.rvYoutubeThumbnail.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.bottomSheet.rvYoutubeThumbnail.setHasFixedSize(true)
+        binding.bottomSheet.rvYoutubeThumbnail.adapter = YoutubeAdapter(requireContext(), youtubeResults.items!!){item,pos->
+            watchYoutubeVideo(item)
         }
     }
 }

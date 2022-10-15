@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/drawable/bg_button_enabled.xml" value="0.1405" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/drawable/loading_dialog.xml" value="0.185" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/activity_add_plant.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
@@ -16,11 +17,13 @@
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/fragment_manage_plants.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/fragment_scan_and_recommendation.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/fragment_settings.xml" value="0.22083333333333333" />
+        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/home_bottom_sheet_fragment.xml" value="0.21614583333333334" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/home_plant_rv.xml" value="0.264" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/item_plant_health_log.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/item_plant_health_overview.xml" value="0.21979166666666666" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/item_youtube_thumbnail.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/layout_dialog.xml" value="0.21979166666666666" />
+        <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/layout_dialog_confirmation.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/loading_dialog.xml" value="0.21979166666666666" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/no_internet.xml" value="0.22083333333333333" />
         <entry key="..\:/ManipallHackathon/IndoorFarming/app/src/main/res/layout/no_internet_dialog.xml" value="0.22083333333333333" />

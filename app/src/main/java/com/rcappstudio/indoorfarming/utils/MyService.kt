@@ -8,6 +8,7 @@ import android.os.IBinder
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -131,247 +132,61 @@ class MyService  : Service() {
         if (
             (plant.minEnvironmentHumidity!! < plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!) &&
             (plant.minSoilPh!! < plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!) &&
-            (plant.minLuminousIntensity!! < plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!) &&
             (plant.minWaterMoistureLevel!! < plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!) &&
             (plant.minEnvironmentTemperature!! < plant.environmentTemperature!! && plant.environmentTemperature < plant.maxEnvironmentTemperature!!)
 
         ) {
             notificationPlantData[plant.key!!] = "${plant.plantName}Plant is happy \uD83D\uDE42"
-            /*Log.d("NotificationData", "evaluateData: " +
-                    "${(plant.minEnvironmentHumidity!! < plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!)}" +
-                    "${(plant.minSoilPh!! < plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!) }" +
-                    "${(plant.minLuminousIntensity!! < plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!)}" +
-                    "${(plant.minWaterMoistureLevel!! < plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!)}" +
-                    "${(plant.minEnvironmentTemperature!! < plant.environmentTemperature!! && plant.environmentTemperature < plant.maxEnvironmentTemperature!!)}"
-*/
-//            )
         }
 
-        /*else if (
-            !(plant.minSoilPh!! > plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!) &&
-            !(plant.minLuminousIntensity!! > plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!) &&
-            !(plant.minWaterMoistureLevel!! > plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!) &&
-            !(plant.minEnvironmentTemperature!! > plant.environmentTemperature!! && plant.environmentTemperature < plant.maxEnvironmentTemperature!!)
-        ) {
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-//            showNotification(plant, "Plant not happy \nEnvironment humidity: ${plant.environmentHumidity}", "\uD83D\uDE1E")
-
-        } else if (
-            !(plant.minEnvironmentHumidity!! > plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!) &&
-            !(plant.minLuminousIntensity!! > plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!) &&
-            !(plant.minWaterMoistureLevel!! > plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!) &&
-            !(plant.minEnvironmentTemperature!! > plant.environmentTemperature!! && plant.environmentTemperature < plant.maxEnvironmentTemperature!!)
-        ) {
-            //If Except soil ph all are dropped
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nSoi PH: ${plant.soilPh}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nSoi PH: ${plant.soilPh}", "\uD83D\uDE1E")
-
-        } else if (
-            !(plant.minEnvironmentHumidity!! > plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!) &&
-            !(plant.minSoilPh!! > plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!) &&
-            !(plant.minWaterMoistureLevel!! > plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!) &&
-            !(plant.minEnvironmentTemperature!! > plant.environmentTemperature!! && plant.environmentTemperature < plant.maxEnvironmentTemperature!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nLuminous intensity: ${plant.luminousIntensity}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nLuminous intensity: ${plant.luminousIntensity}", "\uD83D\uDE1E")
-        } else if (
-            !(plant.minEnvironmentHumidity!! > plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!) &&
-            !(plant.minSoilPh!! > plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!) &&
-            !(plant.minLuminousIntensity!! > plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!) &&
-            !(plant.minEnvironmentTemperature!! > plant.environmentTemperature!! && plant.environmentTemperature < plant.maxEnvironmentTemperature!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nMoisture level: ${plant.waterMoistureLevel}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nMoisture level: ${plant.waterMoistureLevel}", "\uD83D\uDE1E")
-        } else if (
-            !(plant.minEnvironmentHumidity!! > plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!) &&
-            !(plant.minSoilPh!! > plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!) &&
-            !(plant.minLuminousIntensity!! > plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!) &&
-            !(plant.minWaterMoistureLevel!! > plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nTemperature: ${plant.environmentTemperature}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nTemperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")
-        } else if (
-            !(plant.minEnvironmentHumidity!! > plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!) &&
-            !(plant.minSoilPh!! > plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nLight Intensity: ${plant.luminousIntensity}\n" +
-//                    "Moisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}"
-
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-
-//            showNotification(plant, "Plant not happy \nLight Intensity: ${plant.luminousIntensity}\n" +
-//                    "Moisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")
-        } else if (
-            !(plant.minSoilPh!! > plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!) &&
-            !(plant.minLuminousIntensity!! > plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Moisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Moisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")
-        } else if (
-            !(plant.minLuminousIntensity!! > plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!) &&
-            !(plant.minWaterMoistureLevel!! > plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Temperature: ${plant.environmentTemperature}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")
-        } else if (
-            !(plant.minWaterMoistureLevel!! > plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!) &&
-            !(plant.minEnvironmentTemperature!! > plant.environmentTemperature!! && plant.environmentTemperature < plant.maxEnvironmentTemperature!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E2"
-
-//            showNotification(plant, "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}", "\uD83D\uDE1E")
-        } else if (
-            !(plant.minEnvironmentHumidity!! > plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!) &&
-            !(plant.minEnvironmentTemperature!! > plant.environmentTemperature!! && plant.environmentTemperature < plant.maxEnvironmentTemperature!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nWater moisture: ${plant.waterMoistureLevel}\n" +
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nWater moisture: ${plant.waterMoistureLevel}\n" +
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}", "\uD83D\uDE1E")
-        } else if (
-            !(plant.minEnvironmentHumidity!! > plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!) &&
-            !(plant.minSoilPh!! > plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!) &&
-            !(plant.minLuminousIntensity!! > plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nMoisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nMoisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")
-        } else if (
-            !(plant.minSoilPh!! > plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!) &&
-            !(plant.minLuminousIntensity!! > plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!) &&
-            !(plant.minWaterMoistureLevel!! > plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Temperature: ${plant.environmentTemperature}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")
-        } else if (
-            !(plant.minLuminousIntensity!! > plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!) &&
-            !(plant.minWaterMoistureLevel!! > plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!) &&
-            !(plant.minEnvironmentTemperature!! > plant.environmentTemperature!! && plant.environmentTemperature < plant.maxEnvironmentTemperature!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Soil PH: ${plant.soilPh}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Soil PH: ${plant.soilPh}", "\uD83D\uDE1E")
-        } else if (
-            !(plant.minWaterMoistureLevel!! > plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!) &&
-            !(plant.minEnvironmentTemperature!! > plant.environmentTemperature!! && plant.environmentTemperature < plant.maxEnvironmentTemperature!!) &&
-            !(plant.minEnvironmentHumidity!! > plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!)
-        ) {
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nSoil PH: ${plant.soilPh}\n" +
-//                    "Temperature: ${plant.environmentTemperature}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nSoil PH: ${plant.soilPh}\n" +
-//                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")
-        } else if (!(plant.minEnvironmentHumidity!! > plant.environmentHumidity!! && plant.environmentHumidity < plant.maxEnvironmentHumidity!!)) {
-
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nSoil PH: ${plant.soilPh}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}\n" +
-//                    "Moisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nSoil PH: ${plant.soilPh}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}\n" +
-//                    "Moisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")
-        } else if (!(plant.minSoilPh!! > plant.soilPh!!.toDouble() && plant.soilPh.toDouble() < plant.maxSoilPh!!)) {
-
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}\n" +
-//                    "Moisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}\n" +
-//                    "Moisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")
-        } else if (!(plant.minLuminousIntensity!! > plant.luminousIntensity!! && plant.luminousIntensity < plant.maxLuminousIntensity!!)) {
-
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nTemperature: ${plant.environmentTemperature}"
-//            "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Moisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Moisture level: ${plant.waterMoistureLevel}\n" +
-//                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")
-        } else if (!(plant.minWaterMoistureLevel!! > plant.waterMoistureLevel!! && plant.waterMoistureLevel < plant.maxWaterMoistureLevel!!)) {
-
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}\n" +
-//                    "Temperature: ${plant.environmentTemperature}"
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//            showNotification(plant, "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}\n" +
-//                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")
-        } else if (!(plant.minEnvironmentTemperature!! > plant.environmentTemperature!! && plant.environmentTemperature < plant.maxEnvironmentTemperature!!)) {
-
-//            notificationPlantData[plant.plantName!!] = "Plant not happy \nHumidity: ${plant.environmentHumidity}\n" +
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}\n" +
-//                    "Temperature: ${plant.environmentTemperature}"
-
-            notificationPlantData[plant.plantName!!] = "Plant not happy \uD83D\uDE1E"
-
-//                    "Soil PH: ${plant.soilPh}\n" +
-//                    "Light Intensity: ${plant.luminousIntensity}\n" +
-//                    "Temperature: ${plant.environmentTemperature}", "\uD83D\uDE1E")*/
          else {
             notificationPlantData[plant.key!!] = "${plant.plantName}: Plant is not happy\uD83D\uDE1E"
 
-
-//            showNotification(plant, "Plant is healthy", "\uD83D\uDE42")
         }
-//        Log.d("NotificationData", "updateNotificationView: ${notificationPlantData.keys.size} , ${plantKeyList.size}")
+/*
+        var HUMIDITY_FLAG = plant.minEnvironmentHumidity!!.toInt() < plant.environmentHumidity!!.toInt() && plant.environmentHumidity!!.toInt() < plant.maxEnvironmentHumidity!!.toInt()
+        var SOILPH_FLAG = plant.minSoilPh!!.toInt() < plant.soilPh!!.toInt() && plant.soilPh.toInt() < plant.maxSoilPh!!.toInt()
+        var WATERMOISTURE_FLAG = plant.minWaterMoistureLevel!!.toInt() < plant.waterMoistureLevel!!.toInt() && plant.waterMoistureLevel.toInt() < plant.maxWaterMoistureLevel!!.toInt()
+        var TEMPERATURE_FLAG = plant.minEnvironmentTemperature!!.toInt() <plant.environmentTemperature!!.toInt() && plant.environmentTemperature.toInt() < plant.maxEnvironmentTemperature!!.toInt()
+
+
+        //0 -> Humidity
+        //1 -> Soil ph
+        //2 -> Water moisture
+        //3 -> Temperature
+
+        val validateMap = HashMap<HashMap<String,Any?>,Boolean>()
+        val humidityMap  = HashMap<String, Any?>()
+        humidityMap["Humidity level"] = plant.environmentHumidity
+
+        val soilPhMap  = HashMap<String, Any?>()
+        soilPhMap["Soil Ph level"] = plant.soilPh
+
+        val waterMoistureMap  = HashMap<String, Any?>()
+        waterMoistureMap.put("Water moisture level", plant.waterMoistureLevel)
+
+        val temperatureMap  = HashMap<String, Any?>()
+        temperatureMap.put("Temperature level", plant.environmentTemperature)
+
+        validateMap[humidityMap] = HUMIDITY_FLAG
+        validateMap[soilPhMap] = SOILPH_FLAG
+        validateMap[waterMoistureMap] = WATERMOISTURE_FLAG
+        validateMap[temperatureMap] = TEMPERATURE_FLAG
+
+        Log.d("DisplayData", "onBindViewHolder: $HUMIDITY_FLAG , $SOILPH_FLAG, $WATERMOISTURE_FLAG, $TEMPERATURE_FLAG ")
+        var string = ""
+        for(c in validateMap){
+            if(c.value == false){
+                string += "${c.key.keys.toMutableList()[0]}: ${c.key.values.toMutableList()[0]}\n"
+            }
+        }
+        if(string.isEmpty()){
+            binding.rvPlantStatTextView.text = "Plant is healthy  \uD83D\uDE0A"
+            binding.rvCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.greenLight2))
+        } else {
+            binding.rvPlantStatTextView.text = string
+            binding.rvCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.redLight2))
+        }*/
 
         if(notificationPlantData.keys.size == plantKeyList.size) {
             updateNotificationView()
@@ -426,26 +241,26 @@ class MyService  : Service() {
                                 .setValue(Calendar.getInstance().timeInMillis)
     }
 
-//    private fun watchForWaterPumpChanges(plantKeyString: String){
-//        object : CountDownTimer(60000, 1000) {
-//            override fun onTick(millisUntilFinished: Long) {
-//                Log.d("TAGTimerData", "onTick:${millisUntilFinished / 1000} ")
-//
-//            }
-//
-//            override fun onFinish() {
-////                mTextField.setText("done!")
-//                FirebaseDatabase.getInstance().getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}/$plantKeyString/${Constants.PUMP_WATER}")
-//                    .setValue(false)
-//                    .addOnCompleteListener {
-//                        if(it.isSuccessful){
-//
-//
-//                        }
-//                    }
-//            }
-//        }.start()
-//    }
+/*    private fun watchForWaterPumpChanges(plantKeyString: String){
+        object : CountDownTimer(60000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                Log.d("TAGTimerData", "onTick:${millisUntilFinished / 1000} ")
+
+            }
+
+            override fun onFinish() {
+//                mTextField.setText("done!")
+                FirebaseDatabase.getInstance().getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}/$plantKeyString/${Constants.PUMP_WATER}")
+                    .setValue(false)
+                    .addOnCompleteListener {
+                        if(it.isSuccessful){
+
+
+                        }
+                    }
+            }
+        }.start()
+    }*/
 
 
 }

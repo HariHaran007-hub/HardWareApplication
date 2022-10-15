@@ -34,7 +34,13 @@ class PlantsHealthLogAdapter(
             .fit().centerCrop()
             .into(binding.rvYoutubeImageview)
 
-        binding.rvYoutubeTitleTextView.text = "${log.diseaseName}:\n${log.inference}"
+        if(log.diseaseName == "nil"){
+            binding.rvYoutubeTitleTextView.text = "No disease detected"
+        } else {
+            binding.rvYoutubeTitleTextView.text = "${log.diseaseName}:\n${log.inference}"
+        }
+
+
 
         binding.root.setOnClickListener {
             onClick.invoke(log, position)

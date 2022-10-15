@@ -120,8 +120,15 @@ class ManagePlantsFragment : Fragment() {
                             Snackbar.LENGTH_LONG
                         ).show()
                     } else {
-
-                        showAlertDialog(plantsList[position])
+                        FirebaseDatabase.getInstance().getReference("${Constants.MAC_ADDRESS}/${plantsList[position].key}")
+                            .get().addOnSuccessListener {
+                                if(it.exists()){
+                                    Toast.makeText(requireContext(), "Cannot remove master plant!!", Toast.LENGTH_LONG).show()
+                                    fetchData()
+                                } else{
+                                    showAlertDialog(plantsList[position])
+                                }
+                            }
                     }
                 }
             }

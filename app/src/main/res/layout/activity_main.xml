@@ -20,13 +20,13 @@
 
     <com.ismaeldivita.chipnavigation.ChipNavigationBar
         android:id="@+id/bottomBar"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_45sdp"
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
         android:background="@color/white"
-        android:backgroundTint="#D1F8BF"
-        android:hapticFeedbackEnabled="true"
+        android:backgroundTint="@color/white"
         app:cnb_menuResource="@menu/bottom_nav_menu" />
 
 

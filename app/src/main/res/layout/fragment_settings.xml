@@ -80,7 +80,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="From PHOENIX"
+            android:text="From PHOENIX v1.0.0"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/_350sdp"
             android:textSize="@dimen/_12ssp"

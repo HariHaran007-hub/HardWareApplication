@@ -5,26 +5,26 @@
     <item
         android:id="@+id/home"
         android:title="Home"
-        app:cnb_iconColor="@color/black"
+        app:cnb_iconColor="@color/green"
         android:icon="@drawable/ic_baseline_home_24"/>
 
     <item
         android:id="@+id/managePlants"
         android:title="Manage plants"
-        app:cnb_iconColor="@color/black"
-
+        app:cnb_iconColor="@color/green"
         android:icon="@drawable/ic_baseline_manage_accounts_24"/>
 
     <item
         android:id="@+id/scanAndRecommendation"
         android:title="Scan and Recommendation"
-        app:cnb_iconColor="@color/black"
+        app:cnb_iconColor="@color/green"
         android:icon="@drawable/ic_baseline_fiber_smart_record_24"/>
 
     <item
         android:id="@+id/settings"
         android:title="Settings"
-        app:cnb_iconColor="@color/black"
+        app:cnb_iconColor="@color/green"
+
         android:icon="@drawable/ic_baseline_settings_24"/>
 
 </menu>

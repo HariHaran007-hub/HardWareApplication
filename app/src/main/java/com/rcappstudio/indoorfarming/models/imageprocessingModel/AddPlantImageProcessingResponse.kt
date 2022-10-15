@@ -4,6 +4,8 @@ package com.rcappstudio.indoorfarming.models.imageprocessingModel
 import com.google.gson.annotations.SerializedName
 
 data class AddPlantImageProcessingResponse(
+    @SerializedName("data")
+    var data : String ?= null,
     @SerializedName("disease")
     var disease: String? = null,
     @SerializedName("maxEnvironmentHumidity")

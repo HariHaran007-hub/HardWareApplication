@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Bitmap.CompressFormat
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -27,6 +28,7 @@ import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
+import com.rcappstudio.indoorfarming.api.RetrofitInstance
 import com.rcappstudio.indoorfarming.databinding.ActivityAddPlantBinding
 import com.rcappstudio.indoorfarming.models.dbModel.HealthLogModel
 import com.rcappstudio.indoorfarming.models.dbModel.PlantModel
@@ -35,15 +37,18 @@ import com.rcappstudio.indoorfarming.models.imageprocessingModel.Data
 import com.rcappstudio.indoorfarming.utils.Constants
 import com.rcappstudio.indoorfarming.utils.ExampleDialog
 import com.rcappstudio.indoorfarming.utils.LoadingDialog
-import com.rcappstudio.indoorfarming.api.RetrofitInstance
+import com.rcappstudio.indoorfarming.utils.PlantConfirmationDialog
 import retrofit2.HttpException
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 
-class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListener {
+class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListener, PlantConfirmationDialog.PlantConfirmationDialogListener {
 
     private lateinit var macAddress: String
     private lateinit var loadingDialog: LoadingDialog
+    private lateinit var resizedImageUri : Uri
+    private lateinit var responseAddPlantModel : AddPlantImageProcessingResponse
+    private lateinit var staticResponseAddPlantModel : AddPlantImageProcessingResponse
 
     private var databaseReference = FirebaseDatabase.getInstance()
         .getReference("${Constants.USERS}/${FirebaseAuth.getInstance().uid}/${Constants.PLANTS}")
@@ -56,7 +61,9 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
             val uriContent: Uri = result.uriContent!!
             val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uriContent)
             loadingDialog.startLoading()
-            imageProcessingApiCall(uriContent, bitmap)
+            Log.d("ImageData", "imageProcessingApiCall: image bitmap${bitmap} ")
+            Log.d("ImageData", "imageProcessingApiCall: image resized bitmap${getResizedBitmap(bitmap, 256)!!} ")
+            imageProcessingApiCall(uriContent,encodeImage(getResizedBitmap(bitmap, 256)!!)!!, getResizedBitmap(bitmap, 256)!!)
             codeScanner.stopPreview()
         } else {
             val exception = result.error
@@ -74,12 +81,12 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
         codeScanner()
     }
 
-    private fun imageProcessingApiCall(uri: Uri, bitmap: Bitmap?) {
-        Log.d("TAGData", "imageProcessingApiCall: base64 bit ${encodeImage(bitmap!!)}")
-        val dataImage = encodeImage(bitmap)!!
+    private fun imageProcessingApiCall(uri: Uri, encodedImage : String, bitmap: Bitmap? ) {
+//        Log.d("TAGData", "imageProcessingApiCall: base64 bit ${encodeImage(bitmap!!)}")
+//        val dataImage = encodeImage(getResizedBitmap(bitmap, 256)!!)!!
         lifecycleScope.launchWhenStarted {
             val response = try {
-                RetrofitInstance.aiApi.addPlantGetData(Data(dataImage))
+                RetrofitInstance.aiApi.addPlantGetData( Data(encodedImage))
             } catch (e: IOException) {
 
                 return@launchWhenStarted
@@ -93,23 +100,28 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
                 //TODO: Store to firebase and Move to Main activity
                 //TODO: Show Confirmation Dialog for Plant Name
                 Log.d("AIDATA", "imageProcessingApiCall: ${response.body()}")
-                storeImageToCloud(bitmap, response.body(), uri)
+                Toast.makeText(applicationContext, "Response received successfully", Toast.LENGTH_LONG).show()
+
+                Log.d("ImageData", "imageProcessingApiCall: image uri${uri} ")
+//                resizedImageUri = getImageUri(bitmap!!)!!
+////                responseAddPlantModel = response.body()!!
+//                staticResponseAddPlantModel = response.body()!!
+//                openDialog(response.body()!!.plantName!!)
+//                storeImageToCloud()
+                storeImageToCloud(response.body(),  uri)
             } else {
+                Toast.makeText(applicationContext, "Check add plant activity!!", Toast.LENGTH_LONG).show()
                 Log.d("AIDATA", "imageProcessingApiCall: ${response.code()}")
             }
         }
     }
 
-    private fun storeImageToCloud(
-        bitmap: Bitmap?,
-        responseData: AddPlantImageProcessingResponse?,
-        uri: Uri
-    ) {
+    private fun storeImageToCloud(responseData: AddPlantImageProcessingResponse?, uri : Uri?) {
         // TODO:  Currently the response data will be manual in future we will automate it
 
         FirebaseStorage.getInstance()
             .getReference("${Constants.USER_FILES}/${FirebaseAuth.getInstance().uid}/${uri}")
-            .putFile(uri).addOnSuccessListener {
+            .putFile(uri!!).addOnSuccessListener {
                 it.storage.downloadUrl.addOnSuccessListener { url ->
                     storeToDatabase(url.toString().trim(), responseData)
                 }
@@ -277,7 +289,7 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
 
     private fun encodeImage(bm: Bitmap): String? {
         val baos = ByteArrayOutputStream()
-        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        bm.compress(Bitmap.CompressFormat.JPEG, 50, baos)
         val b: ByteArray = baos.toByteArray()
         return Base64.encodeToString(b, Base64.DEFAULT)
     }
@@ -296,7 +308,7 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
 
             decodeCallback = DecodeCallback {
                 runOnUiThread {
-                    applyTexts(it.text.toString().trim())
+                    validateMacAddress(it.text.toString().trim())
                 }
             }
 
@@ -330,6 +342,13 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
 
     override fun applyTexts(macAddress: String?) {
         if (macAddress != null) {
+            this.macAddress = macAddress!!
+            permissionChecker()
+        }
+    }
+
+    private fun validateMacAddress(macAddress: String?){
+        if(macAddress != null){
             this.macAddress = macAddress
             permissionChecker()
         }
@@ -357,5 +376,51 @@ class AddPlantActivity : AppCompatActivity(), ExampleDialog.ExampleDialogListene
                     showRationalDialogForPermissions()
                 }
             }).onSameThread().check()
+    }
+
+    fun getResizedBitmap(image: Bitmap, maxSize: Int): Bitmap? {
+        var width = image.width
+        var height = image.height
+        val bitmapRatio = width.toFloat() / height.toFloat()
+        if (bitmapRatio > 0) {
+            width = maxSize
+            height = (width / bitmapRatio).toInt()
+        } else {
+            height = maxSize
+            width = (height * bitmapRatio).toInt()
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true)
+    }
+
+    fun getImageUri(src: Bitmap): Uri? {
+        val os = ByteArrayOutputStream()
+        src.compress(Bitmap.CompressFormat.JPEG, 50, os)
+        val path = MediaStore.Images.Media.insertImage(contentResolver, src, "title", null)
+        return Uri.parse(path)
+    }
+
+    override fun getPlantsName(username: String?) {
+//        if(username != ""){
+//            responseAddPlantModel = AddPlantImageProcessingResponse(
+//                staticResponseAddPlantModel.data,
+//                staticResponseAddPlantModel.disease,
+//                staticResponseAddPlantModel.maxEnvironmentHumidity,
+//                staticResponseAddPlantModel.maxEnvironmentTemperature,
+//                staticResponseAddPlantModel.maxLuminousIntensity,
+//                staticResponseAddPlantModel.maxSoilPh,
+//                staticResponseAddPlantModel.maxWaterMoistureLevel,
+//                staticResponseAddPlantModel.minEnvironmentHumidity,
+//                staticResponseAddPlantModel.minEnvironmentTemperature,
+//                staticResponseAddPlantModel.minLuminousIntensity,
+//                staticResponseAddPlantModel.minSoilPh,
+//                staticResponseAddPlantModel.minWaterMoistureLevel,
+//                username
+//            )
+//            storeImageToCloud()
+//        } else {
+//            responseAddPlantModel = staticResponseAddPlantModel
+//            storeImageToCloud()
+//        }
+//        storeImageToCloud()
     }
 }

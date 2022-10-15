@@ -48,6 +48,7 @@ import com.rcappstudio.indoorfarming.utils.Constants
 import com.rcappstudio.indoorfarming.utils.LoadingDialog
 import com.rcappstudio.indoorfarming.utils.isConnected
 import com.rcappstudio.indoorfarming.api.RetrofitInstance
+import com.rcappstudio.indoorfarming.models.imageprocessingModel.AddPlantImageProcessingResponse
 import com.rcappstudio.placesapi.youtubeDataModel.YoutubeResults
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -74,7 +75,8 @@ class ScanAndRecommendationFragment : Fragment() {
         if (result.isSuccessful) {
             val uriContent: Uri = result.uriContent!!
             val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uriContent)
-            imageProcessingApiCall(uriContent,bitmap)
+            imageProcessingApiCall(uriContent,encodeImage(getResizedBitmap(bitmap, 256)!!)!!, getResizedBitmap(bitmap, 256)!!)
+
             loadingDialog.startLoading()
         } else {
             val exception = result.error
@@ -173,11 +175,11 @@ class ScanAndRecommendationFragment : Fragment() {
         }
     }
 
-    private fun imageProcessingApiCall(uri: Uri ,bitmap : Bitmap?){
-        val dataImage = encodeImage(bitmap!!)!!
+    private fun imageProcessingApiCall(uri: Uri, encodedImage : String, bitmap: Bitmap?){
+//        val dataImage = encodeImage(bitmap!!)!!
         lifecycleScope.launchWhenStarted{
             val response = try {
-                RetrofitInstance.aiApi.getHealthLog(Data(dataImage))
+                RetrofitInstance.aiApi.getHealthLog(Data(encodedImage))
             } catch (e : IOException){
 
                 return@launchWhenStarted
@@ -188,14 +190,16 @@ class ScanAndRecommendationFragment : Fragment() {
             }
 
             if(response.isSuccessful && response.body() != null){
-                storeImageToCloud(bitmap , response.body(), uri)
+
+                storeImageToCloud(response.body(), getImageUri(bitmap!!)!!)
             } else{
                 //TODO: Show some error occured
             }
         }
     }
 
-    private fun storeImageToCloud(bitmap: Bitmap?, responseData : ImageProcessingResponseData?, uri: Uri){
+    private fun storeImageToCloud(responseData: ImageProcessingResponseData?,
+                                  uri: Uri){
         // TODO:  Currently the response data will be mannual in future we will automate it
 
         FirebaseStorage.getInstance()
@@ -354,6 +358,28 @@ class ScanAndRecommendationFragment : Fragment() {
         } catch (ex: ActivityNotFoundException) {
             startActivity(webIntent)
         }
+    }
+
+
+    fun getResizedBitmap(image: Bitmap, maxSize: Int): Bitmap? {
+        var width = image.width
+        var height = image.height
+        val bitmapRatio = width.toFloat() / height.toFloat()
+        if (bitmapRatio > 0) {
+            width = maxSize
+            height = (width / bitmapRatio).toInt()
+        } else {
+            height = maxSize
+            width = (height * bitmapRatio).toInt()
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true)
+    }
+
+    fun getImageUri(src: Bitmap): Uri? {
+        val os = ByteArrayOutputStream()
+        src.compress(Bitmap.CompressFormat.JPEG, 50, os)
+        val path = MediaStore.Images.Media.insertImage(requireContext().contentResolver, src, "title", null)
+        return Uri.parse(path)
     }
 
 }

@@ -22,6 +22,7 @@ interface Api {
         @Query("maxResults") maxResults: Int ?= 20
     ) : Response<YoutubeResults>
 
+
     @Headers("Content-Type: application/json")
     @POST("addNewPlant")
     suspend fun addPlantGetData(@Body data : Data) : Response<AddPlantImageProcessingResponse>
